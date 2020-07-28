@@ -34,7 +34,7 @@ parser.add_argument('-evalp','--evalp', help='evaluation period', required=False
 parser.add_argument('-an','--addName', help='An add name for the save folder', required=False, default='')
 
 args = vars(parser.parse_args())
-print(args)
+print(f"the args are :{args}")
 
 name = str(args['task'])+str(args['decoder'])+str(args['hidden'])+str(args['batch'])+str(args['learn'])+str(args['drop'])+str(args['layer'])+str(args['limit'])
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m-%d %H:%M')#,filename='save/logs/{}.log'.format(str(name)))

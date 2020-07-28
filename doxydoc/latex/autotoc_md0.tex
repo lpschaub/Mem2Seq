@@ -1,0 +1,82 @@
+{\bfseries Mem2\+Seq\+: Effectively Incorporating Knowledge Bases into End-\/to-\/\+End Task-\/\+Oriented Dialog Systems} (A\+CL 2018). Andrea Madotto, Chien-\/\+Sheng Wu, Pascale Fung. Accepted at {\itshape {\bfseries A\+CL 2018}}. \href{https://aclanthology.coli.uni-saarland.de/papers/P18-1136/p18-1136}{\tt \mbox{[}P\+DF\mbox{]}} in A\+CL anthology. \href{http://andreamad8.github.io/}{\tt Andrea Madotto} and \href{https://jasonwu0731.github.io/}{\tt Chien-\/\+Sheng Wu} contribute equally at this work.
+
+This code has been written using Pytorch 0.\+3, soon we will update the code to Pytorch 0.\+4.
+
+If you use any source codes or datasets included in this toolkit in your work, please cite the following paper. The bibtex are listed below\+: 
+\begin{DoxyPre}
+\{P18-1136,
+  author =  "Madotto, Andrea
+        and Wu, Chien-Sheng
+        and Fung, Pascale",
+  title =   "Mem2Seq: Effectively Incorporating Knowledge Bases into End-to-End Task-Oriented Dialog Systems",
+  booktitle =   "Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+  year =    "2018",
+  publisher =   "Association for Computational Linguistics",
+  pages =   "1468--1478",
+  location =    "Melbourne, Australia",
+  url =     "\href{http://aclweb.org/anthology/P18-1136}{\tt http://aclweb.org/anthology/P18-1136}"
+\}\end{DoxyPre}
+
+
+
+\begin{DoxyPre}\end{DoxyPre}
+
+
+ 
+
+In this repository we implemented Mem2\+Seq and several baseline in pytorch (Version 0.\+3). To make the code more reusable we diveded each model in a separated files (obviusly there is a large code overlap). In the folder models you can find the following\+:
+\begin{DoxyItemize}
+\item {\itshape {\bfseries Mem2\+Seq}}\+: Memory to Sequence (Our model)
+\item {\itshape {\bfseries Seq2\+Seq}}\+: Vanilla seq2seq model with no attention (enc\+\_\+vanilla)
+\item {\itshape {\bfseries +\+Attn}}\+: Luong attention attention model
+\item {\itshape {\bfseries Ptr-\/\+Unk}}\+: combination between Bahdanau attention and Pointer Networks (\href{http://www.aclweb.org/anthology/P16-1014}{\tt Point to U\+NK words})
+\end{DoxyItemize}
+
+All of these file share the same structure, which is\+: a class that builds an encoder and a decoder, and provide training and validation methods (all inside the class).
+
+Under the utils folder, we have the script to import and batch the data for each dataset.
+
+Mem2\+Seq can be considered as a general sequence to sequence model with the ability to address external memories. We prepared a very basic implementation (including data preprocessing and model) for a English to France translation task. Obviusly there is not much to copy from the input in this small corpus, so it is just to show how the model works in a general sequence to sequence task. Run\+: 
+\begin{DoxyCode}
+❱❱❱ python3 main\_nmt.py
+\end{DoxyCode}
+ This version uses a flat memory instead of triple as described in the paper.
+
+We created {\ttfamily \hyperlink{main__train_8py_source}{main\+\_\+train.\+py}} to train models. You can see there is a notation, `globals()\mbox{[}args\mbox{[}\textquotesingle{}decoder\textquotesingle{}\mbox{]}\mbox{]}`, it is converting a string into a fuction. So to train a model you can run\+: Mem2\+Seq b\+AbI t1-\/t6\+: 
+\begin{DoxyCode}
+❱❱❱ python3 main\_train.py -lr=0.001 -layer=1 -hdd=128 -dr=0.2 -dec=Mem2Seq -bsz=8 -ds=babi -t=1 
+❱❱❱ python3 main\_train.py -lr=0.001 -layer=1 -hdd=128 -dr=0.2 -dec=VanillaSeqToSeq -bsz=8 -ds=babi -t=1
+❱❱❱ python3 main\_train.py -lr=0.001 -layer=1 -hdd=128 -dr=0.2 -dec=LuongSeqToSeq -bsz=8 -ds=babi -t=1
+❱❱❱ python3 main\_train.py -lr=0.001 -layer=1 -hdd=128 -dr=0.2 -dec=PTRUNK -bsz=8 -ds=babi -t=1
+\end{DoxyCode}
+ or Mem2\+Seq In-\/\+Car 
+\begin{DoxyCode}
+❱❱❱ python3 main\_train.py -lr=0.001 -layer=1 -hdd=128 -dr=0.2 -dec=Mem2Seq -bsz=8 -ds=kvr -t=
+❱❱❱ python3 main\_train.py -lr=0.001 -layer=1 -hdd=128 -dr=0.2 -dec=VanillaSeqToSeq -bsz=8 -ds=kvr -t=
+❱❱❱ python3 main\_train.py -lr=0.001 -layer=1 -hdd=128 -dr=0.2 -dec=LuongSeqToSeq -bsz=8 -ds=kvr -t=
+❱❱❱ python3 main\_train.py -lr=0.001 -layer=1 -hdd=128 -dr=0.2 -dec=PTRUNK -bsz=8 -ds=kvr -t=
+\end{DoxyCode}
+
+
+the option you can choose are\+:
+\begin{DoxyItemize}
+\item {\ttfamily -\/t} this is task dependent. 1-\/6 for b\+AbI and nothing for In-\/\+Car
+\item {\ttfamily -\/ds} choose which dataset to use (babi and kvr)
+\item {\ttfamily -\/dec} to choose the model. The option are\+: Mem2\+Seq, Vanilla\+Seq\+To\+Seq, Luong\+Seq\+To\+Seq, P\+T\+R\+U\+NK
+\item {\ttfamily -\/hdd} hidden state size of the two rnn
+\item {\ttfamily -\/bsz} batch size
+\item {\ttfamily -\/lr} learning rate
+\item {\ttfamily -\/dr} dropout rate
+\item {\ttfamily -\/layer} number of stacked rnn layers, or number of hops for Mem2\+Seq
+\end{DoxyItemize}
+
+While training, the model with the best validation is saved. If you want to reuse a model add {\ttfamily -\/path=path\+\_\+name\+\_\+model} to the function call. The model is evaluated by using per responce accuracy, W\+ER, F1 and B\+L\+EU.
+
+ 
+
+For hyper-\/parameter search of Mem2\+Seq, our suggestions are\+:
+\begin{DoxyItemize}
+\item Try to use a higher dropout rate (dr $>$= 0.\+2) and larger hidden size (hdd$>$=256) to get better performance when training with small hop (H$<$=3).
+\item While training Mem2\+Seq with larger hops (H$>$3), it may perform better with smaller hidden size (hdd$<$256) and higher dropout rate.
+\item Since there are some variances between runs, so it\textquotesingle{}s better to run several times or run different seeds to get the best performance.
+\end{DoxyItemize}
